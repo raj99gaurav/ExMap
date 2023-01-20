@@ -301,7 +301,7 @@ class App {
     localStorage.setItem("workouts", JSON.stringify(this.#workouts));
   }
   _getLocalStorage() {
-    const data = JSON.parse(localStorage.getItem("workout"));
+    const data = JSON.parse(localStorage.getItem("workouts"));
 
     if (!data) return;
 
@@ -311,6 +311,11 @@ class App {
       this._renderWorkout(work);
       // this._renderWorkoutMarker(work); wont work as map isnt yet created ( at first start ) async java script ka glimpse hai so to fix this w put that logic inside of _loadMap()
     });
+  }
+
+  reset() {
+    localStorage.removeItem("workouts");
+    location.reload(); ///aap.reset() in console to delete all the workout data
   }
 }
 
