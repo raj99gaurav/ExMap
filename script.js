@@ -79,7 +79,13 @@ class App {
   #mapEvent;
   #workouts = [];
   constructor() {
+    //Get user's position
     this._getPosition();
+
+    //Get data from local storage
+    this._getLocalStorage();
+
+    //Attach event handler
     form.addEventListener("submit", this._newWorkout.bind(this));
 
     inputType.addEventListener("change", this._toggleElevationField);
@@ -114,6 +120,10 @@ class App {
 
     //handling clicks on map
     this.#map.on("click", this._showForm.bind(this)); //on is like an eventlistener for maps
+
+    this.#workouts.forEach((work) => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -191,6 +201,9 @@ class App {
     this._renderWorkout(workout);
     //Hide form + Clear input fields
     this._hideForm();
+
+    //Set local storage to all workout
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -279,7 +292,25 @@ class App {
     });
 
     //using the public interface
-    workout.click();
+    // workout.click();
+  }
+
+  //click wont work after refresh as in localstorage the prototype chain gets lost to fix this we can restore the object inside getlocalstorage
+  _setLocalStorage() {
+    //using local storage API -> using blocking so use only for small data other wise app will be slowed
+    localStorage.setItem("workouts", JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem("workout"));
+
+    if (!data) return;
+
+    this.#workouts = data;
+
+    this.#workouts.forEach((work) => {
+      this._renderWorkout(work);
+      // this._renderWorkoutMarker(work); wont work as map isnt yet created ( at first start ) async java script ka glimpse hai so to fix this w put that logic inside of _loadMap()
+    });
   }
 }
 
